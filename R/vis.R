@@ -3,32 +3,17 @@
 gama.plot.partitions <- function(gama.obj = NULL, view = "pca", ...) {
 
   # --- arguments validation --- #
-  Check <- ArgumentCheck::newArgCheck()
+  Check <- checkmate::makeAssertCollection()
 
-  if (is.null(gama.obj))
-    ArgumentCheck::addError(
-      msg = "'gama.obj' can not be NULL",
-      argcheck = Check
-    )
+  checkmate::assert_class(x = gama.obj, 
+                          classes = "gama", 
+                          add = Check)
 
-  if (class(gama.obj) != 'gama')
-    ArgumentCheck::addError(
-      msg = "'gama.obj' must be a gama object.",
-      argcheck = Check
-    )
+  view <- checkmate::matchArg(x = view, 
+                              choices = c('pca', 'total.sum'), 
+                              add = Check)
 
-  if (is.null(view)) {
-    ArgumentCheck::addError(
-      msg = "'view' can not be NULL",
-      argcheck = Check
-    )
-  } else if (!(view %in% c('pca', 'total.sum')))
-    ArgumentCheck::addError(
-      msg = "'view' must be etiher 'pca' or 'total.sum'.",
-      argcheck = Check
-    )
-
-  ArgumentCheck::finishArgCheck(Check)
+  checkmate::reportAssertions(Check)
 
   # --- final of arguments validation --- #
 
