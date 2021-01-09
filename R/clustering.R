@@ -30,59 +30,32 @@ gama <- function(dataset = NULL, k = "broad", scale = FALSE, crossover.rate = 0.
                          plot.internals = TRUE, ...) {
 
   # --- arguments validation --- #
-  Check <- ArgumentCheck::newArgCheck()
+  Check <- checkmate::makeAssertCollection()
 
-  if (is.null(dataset))
-    ArgumentCheck::addError(
-      msg = "'dataset' can not be NULL",
-      argcheck = Check)
-
-  if (class(dataset) != 'data.frame')
-    ArgumentCheck::addError(
-      msg = "'dataset' must be a data.frame object.",
-      argcheck = Check)
-
+  checkmate::assert_data_frame(x = dataset, 
+                               add = Check)
   if (is.null(k))
-    ArgumentCheck::addError(
-      msg = "'k' can not be NULL",
-      argcheck = Check)
+    Check$push("'k' can not be NULL")
 
   if (is.numeric(k)) {
     # forces k to be an integer value
     k <- as.integer(k)
 
     if (k < 2) {
-      ArgumentCheck::addError(
-        msg = "'k' must be a positive integer value greater than one (k > 1), or one of the methods to estimate it: 'minimal' or 'broad'.",
-        argcheck = Check)
+      Check$push("'k' must be a positive integer value greater than one (k > 1), or one of the methods to estimate it: 'minimal' or 'broad'.")
     }
   } else if (is.character(k)) {
     if (!(k %in% c('minimal', 'broad')))
-      ArgumentCheck::addError(
-        msg = "'k' must be a positive integer value greater than one (k > 1), or one of the methods to estimate it: 'minimal' or 'broad'.",
-        argcheck = Check)
+      Check$push("'k' must be a positive integer value greater than one (k > 1), or one of the methods to estimate it: 'minimal' or 'broad'.")
   }
 
-  if (is.null(fitness.criterion)) {
-    ArgumentCheck::addError(
-      msg = "'fitness.criterion' can not be NULL.",
-      argcheck = Check)
+  fitness.criterion <- checkmate::matchArg(x = fitness.criterion, 
+                                           choices = c('ASW', 'CH', 'CI', 'DI'))
+  
+  checkmate::assert_function(x = penalty.function, 
+                             add = Check)
 
-  } else if (!(fitness.criterion %in% c('ASW', 'CH', 'CI', 'DI'))) {
-    ArgumentCheck::addError(
-      msg = "'fitness.criterion' must be one of the criteria: 'ASW', 'CH', 'CI' or 'DI'.",
-      argcheck = Check)
-  }
-
-  if (!is.null(penalty.function)) {
-    if (class(penalty.function) != "function") {
-      ArgumentCheck::addError(
-        msg = "'penalty.function' must be a valid R function.",
-        argcheck = Check)
-    }
-  }
-
-  ArgumentCheck::finishArgCheck(Check)
+  checkmate::reportAssertions(Check)
 
   # --- final of arguments validation --- #
 
