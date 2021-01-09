@@ -3,28 +3,17 @@
 gama.how.many.k <- function(dataset = NULL, method = "minimal") {
 
     # --- arguments validation --- #
-    Check <- ArgumentCheck::newArgCheck()
+    Check <- checkmate::makeAssertCollection()
 
-    if (is.null(dataset))
-      ArgumentCheck::addError(
-        msg = "'dataset' can not be NULL",
-        argcheck = Check
-      )
-
-    if (class(dataset) != 'data.frame')
-      ArgumentCheck::addError(
-        msg = "'dataset' must be a data.frame object.",
-        argcheck = Check
-      )
-
-    if (!(method %in% c('minimal', 'broad')))
-      ArgumentCheck::addError(
-        msg = "'method' must be one of the values: 'minimal' or 'broad'.",
-        argcheck = Check
-      )
-
-    ArgumentCheck::finishArgCheck(Check)
-
+    checkmate::assert_data_frame(x = dataset, 
+                                 add = Check)
+    
+    method <- checkmate::matchArg(x = method, 
+                                  choices = c("minimal", "broad"), 
+                                 add = Check))
+    
+    checkmate::reportAssertions(Check)
+    
     # --- final of arguments validation --- #
 
     best.k <- -1
